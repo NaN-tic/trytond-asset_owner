@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!-- The COPYRIGHT file at the top level of this repository contains the full
+     copyright notices and license terms. -->
+<data>
+    <xpath expr="/form/notebook" position="before">
+        <label name="owner"/>
+        <field name="owner"/>
+        <label name="address"/>
+        <field name="address"/>
+        <label name="contact"/>
+        <field name="contact"/>
+        <label name="owner_reference"/>
+        <field name="owner_reference"/>
+    </xpath>
+</data>

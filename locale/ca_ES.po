@@ -1,0 +1,19 @@
+# 
+msgid ""
+msgstr "Content-Type: text/plain; charset=utf-8\n"
+
+msgctxt "field:asset,address:"
+msgid "Address"
+msgstr "Adreça"
+
+msgctxt "field:asset,contact:"
+msgid "Contact"
+msgstr "Contacte"
+
+msgctxt "field:asset,owner:"
+msgid "Owner"
+msgstr "Propietari"
+
+msgctxt "field:asset,owner_reference:"
+msgid "Owner Reference"
+msgstr "Referència propietari"
