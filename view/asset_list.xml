@@ -4,5 +4,6 @@
 <data>
     <xpath expr="/tree/field[@name='product']" position="after">
         <field name="owner"/>
+        <field name="address"/>
     </xpath>
 </data>
