@@ -22,7 +22,7 @@ class Asset:
     @fields.depends('owner')
     def on_change_owner(self):
         changes = {
-            'addchangess': None,
+            'address': None,
             }
 
         if self.owner:
