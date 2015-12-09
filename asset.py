@@ -21,14 +21,6 @@ class Asset:
 
     @fields.depends('owner')
     def on_change_owner(self):
-        changes = {
-            'address': None,
-            }
-
+        self.address = None
         if self.owner:
-            address = self.owner.address_get()
-            if not address:
-                return changes
-            changes['address'] = address.id
-            changes['address.rec_name'] = address.rec_name
-        return changes
+            self.address = self.owner.address_get()
