@@ -37,10 +37,7 @@ class Asset:
         for name in names:
             result[name] = dict((i.id, None) for i in assets)
 
-        print "***************************************************"
-        print assigments
         for asset, assigment_id in assigments.iteritems():
-            print "asset", asset, assigment_id
             if not assigment_id:
                 continue
             assigment = AssetOwner(assigment_id)
