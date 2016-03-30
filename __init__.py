@@ -7,4 +7,5 @@ from .asset import *
 def register():
     Pool.register(
         Asset,
+        AssetOwner,
         module='asset_owner', type_='model')

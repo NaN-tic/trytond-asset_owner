@@ -1,26 +1,25 @@
-#The COPYRIGHT file at the top level of this repository contains the full
-#copyright notices and license terms.
-from trytond.model import fields
+# The COPYRIGHT file at the top level of this repository contains the full
+# copyright notices and license terms.
 from trytond.pool import PoolMeta
-from trytond.pyson import Eval
+from trytond.model import ModelView, ModelSQL, fields
+from trytond.modules.asset.asset import AssetAssigmentMixin
 
-__all__ = ['Asset']
+__all__ = ['Asset', 'AssetOwner']
 __metaclass__ = PoolMeta
 
 
-class Asset:
-    __name__ = 'asset'
+class AssetOwner(ModelSQL, ModelView, AssetAssigmentMixin):
+    'Asset Owner'
+
+    __name__ = 'asset.owner'
+
     owner = fields.Many2One('party.party', 'Owner')
-    address = fields.Many2One('party.address', 'Address',
-        domain=[
-            ('party', '=', Eval('owner')),
-            ],
-        depends=['owner'])
     contact = fields.Many2One('party.party', 'Contact')
+    asset = fields.Many2One('asset', 'Asset')
     owner_reference = fields.Char('Owner Reference')
 
-    @fields.depends('owner')
-    def on_change_owner(self):
-        self.address = None
-        if self.owner:
-            self.address = self.owner.address_get()
+
+class Asset:
+
+    __name__ = 'asset'
+    owners = fields.One2Many('asset.owner', 'asset', 'Owners')
