@@ -4,6 +4,10 @@
 <data>
     <xpath expr="/form/notebook/page[@id='address']" position="after">
         <page id="owners" string="Owners">
+            <label name="current_owner"/>
+            <field name="current_owner"/>
+            <label name="current_owner_contact"/>
+            <field name="current_owner_contact"/>
             <field name="owners" colspan="4"/>
         </page>
     </xpath>
