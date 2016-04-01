@@ -1,14 +1,14 @@
 # The COPYRIGHT file at the top level of this repository contains the full
 # copyright notices and license terms.
 from trytond.pool import PoolMeta, Pool
-from trytond.model import ModelView, ModelSQL, fields
-from trytond.modules.asset.asset import AssetAssigmentMixin
+from trytond.model import fields
+from trytond.modules.asset.asset import AssetAssignmentMixin
 
 __all__ = ['Asset', 'AssetOwner']
 __metaclass__ = PoolMeta
 
 
-class AssetOwner(AssetAssigmentMixin):
+class AssetOwner(AssetAssignmentMixin):
     'Asset Owner'
 
     __name__ = 'asset.owner'
