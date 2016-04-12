@@ -12,8 +12,8 @@ msgstr "Contacto"
 
 msgctxt "field:asset,owner:"
 msgid "Owner"
-msgstr "Propietario"
+msgstr "Titular"
 
 msgctxt "field:asset,owner_reference:"
 msgid "Owner Reference"
-msgstr "Referencia Propietario"
+msgstr "Referencia Titular"
