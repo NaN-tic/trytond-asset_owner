@@ -5,28 +5,27 @@ from trytond.model import fields
 from trytond.modules.asset.asset import AssetAssignmentMixin
 
 __all__ = ['Asset', 'AssetOwner']
-__metaclass__ = PoolMeta
 
 
 class AssetOwner(AssetAssignmentMixin):
     'Asset Owner'
-
     __name__ = 'asset.owner'
-
+    asset = fields.Many2One('asset', 'Asset')
     owner = fields.Many2One('party.party', 'Owner')
     contact = fields.Many2One('party.party', 'Contact')
-    asset = fields.Many2One('asset', 'Asset')
     owner_reference = fields.Char('Owner Reference')
 
 
 class Asset:
-
     __name__ = 'asset'
+    __metaclass__ = PoolMeta
     owners = fields.One2Many('asset.owner', 'asset', 'Owners')
     current_owner = fields.Function(fields.Many2One('party.party',
-        'Current Owner'), 'get_current_owner')
+            'Current Owner'),
+        'get_current_owner')
     current_owner_contact = fields.Function(fields.Many2One('party.party',
-        'Current Owner Contact'), 'get_current_owner')
+            'Current Owner Contact'),
+        'get_current_owner')
 
     @classmethod
     def get_current_owner(cls, assets, names):
@@ -42,6 +41,6 @@ class Asset:
                 continue
             assigment = AssetOwner(assigment_id)
             result['current_owner'][asset] = assigment.owner.id
-            result['current_owner_contact'][asset] = assigment.contact and \
-                assigment.contact.id
+            result['current_owner_contact'][asset] = (assigment.contact.id
+                if assigment.contact else None)
         return result
