@@ -93,7 +93,8 @@ class Asset:
                 continue
             assigment = AssetOwner(assigment_id)
             if 'current_owner' in names:
-                result['current_owner'][asset] = assigment.owner and assigment.owner.id
+                result['current_owner'][asset] = (assigment.owner.id
+                    if assigment.owner else None)
             if 'current_owner_contact' in names:
                 result['current_owner_contact'][asset] = (assigment.contact.id
                     if assigment.contact else None)
