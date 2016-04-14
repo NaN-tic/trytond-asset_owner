@@ -3,7 +3,6 @@
      copyright notices and license terms. -->
 <data>
     <xpath expr="/tree/field[@name='product']" position="after">
-        <field name="owner"/>
-        <field name="address"/>
+        <field name="current_owner"/>
     </xpath>
 </data>

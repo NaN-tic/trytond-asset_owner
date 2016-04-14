@@ -3,17 +3,15 @@
     <data>
         <record model="ir.ui.view" id="asset_view_form">
             <field name="model">asset</field>
-            <field name="type" eval="None"/>
             <field name="inherit" ref="asset.asset_view_form"/>
             <field name="name">asset_form</field>
         </record>
-   <!--      <record model="ir.ui.view" id="asset_view_list">
+
+         <record model="ir.ui.view" id="asset_view_list">
             <field name="model">asset</field>
-            <field name="type" eval="None"/>
             <field name="inherit" ref="asset.asset_view_list"/>
             <field name="name">asset_list</field>
         </record>
- -->
 
        <record model="ir.ui.view" id="asset_owner_view_list">
             <field name="model">asset.owner</field>
