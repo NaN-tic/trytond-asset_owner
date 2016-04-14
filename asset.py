@@ -11,7 +11,8 @@ class AssetOwner(AssetAssignmentMixin):
     'Asset Owner'
     __name__ = 'asset.owner'
     asset = fields.Many2One('asset', 'Asset')
-    owner = fields.Many2One('party.party', 'Owner')
+    owner = fields.Many2One('party.party', 'Owner',
+        required=True)
     contact = fields.Many2One('party.party', 'Contact')
     owner_reference = fields.Char('Owner Reference')
 
@@ -40,7 +41,9 @@ class Asset:
             if not assigment_id:
                 continue
             assigment = AssetOwner(assigment_id)
-            result['current_owner'][asset] = assigment.owner.id
-            result['current_owner_contact'][asset] = (assigment.contact.id
-                if assigment.contact else None)
+            if 'current_owner' in names:
+                result['current_owner'][asset] = assigment.owner and assigment.owner.id
+            if 'current_owner_contact' in names:
+                result['current_owner_contact'][asset] = (assigment.contact.id
+                    if assigment.contact else None)
         return result
