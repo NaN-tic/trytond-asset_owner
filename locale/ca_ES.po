@@ -2,13 +2,13 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
+msgctxt "error:asset.owner:"
+msgid "\"%(first)s\" and \"%(second)s\" assigment overlap."
+msgstr "\"%(first)s\" i \"%(second)s\" es solapen."
+
 msgctxt "field:asset,address:"
 msgid "Address"
 msgstr "Adreça"
-
-msgctxt "field:asset,contact:"
-msgid "Contact"
-msgstr "Contacte"
 
 msgctxt "field:asset,current_owner:"
 msgid "Current Owner"
@@ -17,14 +17,6 @@ msgstr "Titular actual"
 msgctxt "field:asset,current_owner_contact:"
 msgid "Current Owner Contact"
 msgstr "Contacte del titular actual"
-
-msgctxt "field:asset,owner:"
-msgid "Owner"
-msgstr "Titular"
-
-msgctxt "field:asset,owner_reference:"
-msgid "Owner Reference"
-msgstr "Referència titular"
 
 msgctxt "field:asset,owners:"
 msgid "Owners"
