@@ -1,7 +1,8 @@
 # The COPYRIGHT file at the top level of this repository contains the full
 # copyright notices and license terms.
-from datetime import date
+from datetime import date, datetime
 from sql import Null, Literal
+from sql.conditionals import Coalesce
 
 from trytond import backend
 from trytond.pool import PoolMeta, Pool
@@ -61,7 +62,7 @@ class Asset:
     owners = fields.One2Many('asset.owner', 'asset', 'Owners')
     current_owner = fields.Function(fields.Many2One('party.party',
             'Current Owner'),
-        'get_current_owner')
+        'get_current_owner', searcher='search_current_owner')
     current_owner_contact = fields.Function(fields.Many2One('party.party',
             'Current Owner Contact'),
         'get_current_owner')
@@ -86,3 +87,32 @@ class Asset:
                 result['current_owner_contact'][asset] = (assigment.contact.id
                     if assigment.contact else None)
         return result
+
+    @classmethod
+    def search_current_owner(cls, name, clause):
+        pool = Pool()
+        Date = pool.get('ir.date')
+        AssetOwner = pool.get('asset.owner')
+        Party = pool.get('party.party')
+        transaction = Transaction()
+        table = AssetOwner.__table__()
+        party = Party.__table__()
+        condition = party.id == table.owner
+        tables = {
+            None: (table, None),
+            'owner': {
+                None: (party, condition),
+                }
+            }
+        date = transaction.context.get('_datetime', Date.today())
+        if isinstance(date, datetime):
+            date = date.date()
+        clause[0] = 'owner'
+        expression = AssetOwner.owner.convert_domain(clause, tables,
+            AssetOwner)
+        query = party.join(table, condition=condition).select(
+            table.asset, where=(
+                (Literal(date) >= Coalesce(table.from_date, date.min))
+                & (Literal(date) <= Coalesce(table.through_date, date.max))
+                & expression))
+        return [('id', 'in', query)]
