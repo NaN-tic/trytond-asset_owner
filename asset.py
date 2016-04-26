@@ -17,7 +17,7 @@ __all__ = ['Asset', 'AssetOwner']
 class AssetOwner(AssetAssignmentMixin):
     'Asset Owner'
     __name__ = 'asset.owner'
-    asset = fields.Many2One('asset', 'Asset')
+    asset = fields.Many2One('asset', 'Asset', required=True, ondelete='CASCADE')
     owner = fields.Many2One('party.party', 'Owner',
         required=True)
     contact = fields.Many2One('party.party', 'Contact')
