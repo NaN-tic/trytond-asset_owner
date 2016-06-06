@@ -3,7 +3,7 @@ msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
 msgctxt "error:asset.owner:"
-msgid "\"%(first)s\" and \"%(second)s\" assigment overlap."
+msgid "\"%(first)s\" and \"%(second)s\" overlap."
 msgstr "\"%(first)s\" i \"%(second)s\" es solapen."
 
 msgctxt "field:asset,address:"
@@ -36,7 +36,7 @@ msgstr "Data creació"
 
 msgctxt "field:asset.owner,create_uid:"
 msgid "Create User"
-msgstr "Usuari de creació"
+msgstr "Usuari creació"
 
 msgctxt "field:asset.owner,from_date:"
 msgid "From Date"
@@ -44,7 +44,7 @@ msgstr "Data inicial"
 
 msgctxt "field:asset.owner,id:"
 msgid "ID"
-msgstr "Identificador"
+msgstr "ID"
 
 msgctxt "field:asset.owner,owner:"
 msgid "Owner"
