@@ -1,71 +1,94 @@
 # The COPYRIGHT file at the top level of this repository contains the full
 # copyright notices and license terms.
-from datetime import date, datetime
-from sql import Null, Literal
-from sql.conditionals import Coalesce
+from datetime import date
+from sql import Null
 
 from trytond import backend
 from trytond.pool import PoolMeta, Pool
 from trytond.model import fields
 from trytond.transaction import Transaction
-
+from trytond.pyson import Eval
 from trytond.modules.asset.asset import AssetAssignmentMixin
 
 __all__ = ['Asset', 'AssetOwner']
+__metaclass__ = PoolMeta
 
 
 class AssetOwner(AssetAssignmentMixin):
     'Asset Owner'
     __name__ = 'asset.owner'
-    asset = fields.Many2One('asset', 'Asset', required=True, ondelete='CASCADE')
-    owner = fields.Many2One('party.party', 'Owner',
-        required=True)
+    asset = fields.Many2One('asset', 'Asset', required=True, ondelete='CASCADE',
+        domain=[
+            ('company', '=', Eval('context', {}).get('company', -1)),
+            ])
+    owner = fields.Many2One('party.party', 'Owner', required=True)
     contact = fields.Many2One('party.party', 'Contact')
     owner_reference = fields.Char('Owner Reference')
+    company = fields.Function(fields.Many2One('company.company', 'Company'),
+        'on_change_with_company', searcher='search_company')
+
+    @fields.depends('asset')
+    def on_change_with_company(self, name=None):
+        if self.asset and self.asset.company:
+            return self.asset.company.id
 
     @classmethod
-    def __register__(cls, module_name):
-        pool = Pool()
-        Asset = pool.get('asset')
-        TableHandler = backend.get('TableHandler')
-        cursor = Transaction().connection.cursor()
-
-        table = cls.__table__()
-        asset_table = Asset.__table__()
-
-        handler = TableHandler(Asset, module_name)
-        migrate_data = not handler.table_exist(cls._table)
-        owner_exist = handler.column_exist('owner')
-
-        super(AssetOwner, cls).__register__(module_name)
-
-        # Migration: owner from asset table
-        if migrate_data and owner_exist:
-            cursor.execute(*table.insert([
-                    table.asset,
-                    table.owner,
-                    table.contact,
-                    table.owner_reference,
-                    table.from_date],
-                    asset_table.select(
-                        asset_table.id,
-                        asset_table.owner,
-                        asset_table.contact,
-                        asset_table.owner_reference,
-                        Literal(date.min),
-                        where=asset_table.owner != Null)))
+    def search_company(cls, name, clause):
+        return [('asset.%s' % name,) + tuple(clause[1:])]
 
 
 class Asset:
     __name__ = 'asset'
-    __metaclass__ = PoolMeta
     owners = fields.One2Many('asset.owner', 'asset', 'Owners')
     current_owner = fields.Function(fields.Many2One('party.party',
-            'Current Owner'),
-        'get_current_owner', searcher='search_current_owner')
+        'Current Owner'), 'get_current_owner')
     current_owner_contact = fields.Function(fields.Many2One('party.party',
-            'Current Owner Contact'),
-        'get_current_owner')
+        'Current Owner Contact'), 'get_current_owner')
+
+    @classmethod
+    def __register__(cls, module_name):
+        pool = Pool()
+        AssetOwner = pool.get('asset.owner')
+        TableHandler = backend.get('TableHandler')
+
+        table = cls.__table__()
+        asset_owner_table = AssetOwner.__table__()
+
+        cursor = Transaction().cursor
+        handler = TableHandler(cursor, cls, module_name)
+        owner_exist = handler.column_exist('owner')
+        contact_exist = handler.column_exist('contact')
+        owner_reference_exist = handler.column_exist('owner_reference')
+
+        super(Asset, cls).__register__(module_name)
+
+        handler = TableHandler(cursor, cls, module_name)
+        # Migration: owner Many2One replaced by One2Many
+        if owner_exist:
+            assert contact_exist and owner_reference_exist
+            cursor.execute(*table.select(
+                    table.id,
+                    table.owner,
+                    table.contact,
+                    table.owner_reference,
+                    where=table.owner != Null))
+            for asset_id, owner_id, contact_id, owner_reference \
+                    in cursor.fetchall():
+                asset_owner_table.insert([
+                        asset_owner_table.asset,
+                        asset_owner_table.owner,
+                        asset_owner_table.contact,
+                        asset_owner_table.owner_reference,
+                        asset_owner_table.from_date],
+                    [[
+                            asset_id,
+                            owner_id,
+                            contact_id if contact_id else Null,
+                            owner_reference if owner_reference else Null,
+                            date.min]])
+            handler.drop_column('owner')
+            handler.drop_column('contact')
+            handler.drop_column('owner_reference')
 
     @classmethod
     def get_current_owner(cls, assets, names):
@@ -87,32 +110,3 @@ class Asset:
                 result['current_owner_contact'][asset] = (assigment.contact.id
                     if assigment.contact else None)
         return result
-
-    @classmethod
-    def search_current_owner(cls, name, clause):
-        pool = Pool()
-        Date = pool.get('ir.date')
-        AssetOwner = pool.get('asset.owner')
-        Party = pool.get('party.party')
-        transaction = Transaction()
-        table = AssetOwner.__table__()
-        party = Party.__table__()
-        condition = party.id == table.owner
-        tables = {
-            None: (table, None),
-            'owner': {
-                None: (party, condition),
-                }
-            }
-        date = transaction.context.get('_datetime', Date.today())
-        if isinstance(date, datetime):
-            date = date.date()
-        new_clause = tuple(('owner',)) + tuple(clause[1:])
-        expression = AssetOwner.owner.convert_domain(new_clause, tables,
-            AssetOwner)
-        query = party.join(table, condition=condition).select(
-            table.asset, where=(
-                (Literal(date) >= Coalesce(table.from_date, date.min))
-                & (Literal(date) <= Coalesce(table.through_date, date.max))
-                & expression))
-        return [('id', 'in', query)]
