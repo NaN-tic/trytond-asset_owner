@@ -1,20 +1,20 @@
-<?xml version="1.0"?>
-<!-- The COPYRIGHT file at the top level of this repository contains the full
-     copyright notices and license terms. -->
+<?xml version="1.0" encoding="utf-8"?>
 <tryton>
     <data>
+
         <record model="ir.ui.view" id="asset_view_form">
             <field name="model">asset</field>
+            <field name="type">form</field>
             <field name="inherit" ref="asset.asset_view_form"/>
             <field name="name">asset_form</field>
         </record>
-
-         <record model="ir.ui.view" id="asset_view_list">
+   <!--      <record model="ir.ui.view" id="asset_view_list">
             <field name="model">asset</field>
+            <field name="type">tree</field>
             <field name="inherit" ref="asset.asset_view_list"/>
             <field name="name">asset_list</field>
         </record>
-
+ -->
        <record model="ir.ui.view" id="asset_owner_view_form">
             <field name="model">asset.owner</field>
             <field name="type">form</field>
@@ -24,6 +24,33 @@
             <field name="model">asset.owner</field>
             <field name="type">tree</field>
             <field name="name">asset_owner_list</field>
+        </record>
+
+        <record model="ir.model.access" id="access_asset_owner">
+            <field name="model" search="[('model', '=', 'asset.owner')]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+        <record model="ir.model.access" id="access_asset_group_asset">
+            <field name="model" search="[('model', '=', 'asset.owner')]"/>
+            <field name="group" ref="asset.group_asset"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="True"/>
+        </record>
+
+        <record model="ir.rule.group" id="rule_group_asset">
+            <field name="model" search="[('model', '=', 'asset.owner')]"/>
+            <field name="global_p" eval="True"/>
+        </record>
+        <record model="ir.rule" id="rule_asset1">
+            <field name="domain"
+                eval="[('company', '=', Eval('user', {}).get('company', None))]"
+                pyson="1"/>
+            <field name="rule_group" ref="rule_group_asset"/>
         </record>
     </data>
 </tryton>
