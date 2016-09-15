@@ -17,10 +17,8 @@ __metaclass__ = PoolMeta
 class AssetOwner(AssetAssignmentMixin):
     'Asset Owner'
     __name__ = 'asset.owner'
-    asset = fields.Many2One('asset', 'Asset', required=True, ondelete='CASCADE',
-        domain=[
-            ('company', '=', Eval('context', {}).get('company', -1)),
-            ])
+    asset = fields.Many2One('asset', 'Asset', required=True,
+        ondelete='CASCADE')
     owner = fields.Many2One('party.party', 'Owner', required=True)
     contact = fields.Many2One('party.party', 'Contact')
     owner_reference = fields.Char('Owner Reference')
