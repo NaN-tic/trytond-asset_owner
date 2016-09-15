@@ -7,7 +7,7 @@ from trytond import backend
 from trytond.pool import PoolMeta, Pool
 from trytond.model import fields
 from trytond.transaction import Transaction
-
+from trytond.pyson import Eval
 from trytond.modules.asset.asset import AssetAssignmentMixin
 
 __all__ = ['Asset', 'AssetOwner']
@@ -17,10 +17,24 @@ __metaclass__ = PoolMeta
 class AssetOwner(AssetAssignmentMixin):
     'Asset Owner'
     __name__ = 'asset.owner'
-    asset = fields.Many2One('asset', 'Asset', required=True, ondelete='CASCADE')
+    asset = fields.Many2One('asset', 'Asset', required=True, ondelete='CASCADE',
+        domain=[
+            ('company', '=', Eval('context', {}).get('company', -1)),
+            ])
     owner = fields.Many2One('party.party', 'Owner', required=True)
     contact = fields.Many2One('party.party', 'Contact')
     owner_reference = fields.Char('Owner Reference')
+    company = fields.Function(fields.Many2One('company.company', 'Company'),
+        'on_change_with_company', searcher='search_company')
+
+    @fields.depends('asset')
+    def on_change_with_company(self, name=None):
+        if self.asset and self.asset.company:
+            return self.asset.company.id
+
+    @classmethod
+    def search_company(cls, name, clause):
+        return [('asset.%s' % name,) + tuple(clause[1:])]
 
 
 class Asset:
