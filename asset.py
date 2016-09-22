@@ -52,15 +52,15 @@ class Asset:
         table = cls.__table__()
         asset_owner_table = AssetOwner.__table__()
 
-        cursor = Transaction().cursor
-        handler = TableHandler(cursor, cls, module_name)
+        cursor = Transaction().connection.cursor()
+        handler = TableHandler(cls, module_name)
         owner_exist = handler.column_exist('owner')
         contact_exist = handler.column_exist('contact')
         owner_reference_exist = handler.column_exist('owner_reference')
 
         super(Asset, cls).__register__(module_name)
 
-        handler = TableHandler(cursor, cls, module_name)
+        handler = TableHandler(cls, module_name)
         # Migration: owner Many2One replaced by One2Many
         if owner_exist:
             assert contact_exist and owner_reference_exist
