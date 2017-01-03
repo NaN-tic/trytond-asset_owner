@@ -72,18 +72,18 @@ class Asset:
                     where=table.owner != Null))
             for asset_id, owner_id, contact_id, owner_reference \
                     in cursor.fetchall():
-                asset_owner_table.insert([
+                cursor.execute(*asset_owner_table.insert([
                         asset_owner_table.asset,
                         asset_owner_table.owner,
                         asset_owner_table.contact,
                         asset_owner_table.owner_reference,
-                        asset_owner_table.from_date],
+                        ],
                     [[
                             asset_id,
                             owner_id,
                             contact_id if contact_id else Null,
                             owner_reference if owner_reference else Null,
-                            date.min]])
+                            ]]))
             handler.drop_column('owner')
             handler.drop_column('contact')
             handler.drop_column('owner_reference')
