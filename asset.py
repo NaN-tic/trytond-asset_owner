@@ -62,7 +62,7 @@ class Asset:
 
         handler = TableHandler(cls, module_name)
         # Migration: owner Many2One replaced by One2Many
-        if owner_exist:
+        if owner_exist and asset_owner_table:
             assert contact_exist and owner_reference_exist
             cursor.execute(*table.select(
                     table.id,
