@@ -11,7 +11,6 @@ from trytond.transaction import Transaction
 from trytond.modules.asset.asset import AssetAssignmentMixin
 
 __all__ = ['Asset', 'AssetOwner']
-__metaclass__ = PoolMeta
 
 
 class AssetOwner(AssetAssignmentMixin):
@@ -37,6 +36,8 @@ class AssetOwner(AssetAssignmentMixin):
 
 class Asset:
     __name__ = 'asset'
+    __metaclass__ = PoolMeta
+
     owners = fields.One2Many('asset.owner', 'asset', 'Owners')
     current_owner = fields.Function(fields.Many2One('party.party',
         'Current Owner'), 'get_current_owner')
@@ -60,6 +61,9 @@ class Asset:
 
         super(Asset, cls).__register__(module_name)
 
+        pool = Pool()
+        Date = pool.get('ir.date')
+        today = Date.today()
         handler = TableHandler(cls, module_name)
         # Migration: owner Many2One replaced by One2Many
         if owner_exist and asset_owner_table:
@@ -77,13 +81,16 @@ class Asset:
                         asset_owner_table.owner,
                         asset_owner_table.contact,
                         asset_owner_table.owner_reference,
+                        asset_owner_table.from_date,
                         ],
                     [[
                             asset_id,
                             owner_id,
                             contact_id if contact_id else Null,
                             owner_reference if owner_reference else Null,
+                            today
                             ]]))
+
             handler.drop_column('owner')
             handler.drop_column('contact')
             handler.drop_column('owner_reference')
