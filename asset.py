@@ -40,9 +40,10 @@ class Asset:
 
     owners = fields.One2Many('asset.owner', 'asset', 'Owners')
     current_owner = fields.Function(fields.Many2One('party.party',
-        'Current Owner'), 'get_current_owner')
+            'Current Owner'), 'get_current_owner',
+        searcher='search_current_owner')
     current_owner_contact = fields.Function(fields.Many2One('party.party',
-        'Current Owner Contact'), 'get_current_owner')
+            'Current Owner Contact'), 'get_current_owner')
 
     @classmethod
     def __register__(cls, module_name):
@@ -115,3 +116,11 @@ class Asset:
                 result['current_owner_contact'][asset] = (assigment.contact.id
                     if assigment.contact else None)
         return result
+
+    @classmethod
+    def search_current_owner(cls, name, clause):
+        pool = Pool()
+        AssetOwner = pool.get('asset.owner')
+        query = AssetOwner.search([tuple(('asset',)) + tuple(clause[1:])],
+            query=True)
+        return [('id', 'in', query)]
