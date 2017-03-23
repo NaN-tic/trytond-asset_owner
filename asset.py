@@ -121,6 +121,6 @@ class Asset:
     def search_current_owner(cls, name, clause):
         pool = Pool()
         AssetOwner = pool.get('asset.owner')
-        query = AssetOwner.search([tuple(('asset',)) + tuple(clause[1:])],
-            query=True)
-        return [('id', 'in', query)]
+        owners = AssetOwner.search(
+            [tuple(('owner.name',)) + tuple(clause[1:])])
+        return [('id', 'in', [x.asset.id for x in owners])]
