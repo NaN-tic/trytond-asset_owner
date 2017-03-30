@@ -122,5 +122,6 @@ class Asset:
         pool = Pool()
         AssetOwner = pool.get('asset.owner')
         owners = AssetOwner.search(
-            [tuple(('owner.name',)) + tuple(clause[1:])])
+            [tuple(('owner',)) + tuple(clause[1:])])
+
         return [('id', 'in', [x.asset.id for x in owners])]
