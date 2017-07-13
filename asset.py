@@ -39,6 +39,10 @@ class Asset:
     __metaclass__ = PoolMeta
 
     owners = fields.One2Many('asset.owner', 'asset', 'Owners')
+    current_asset_owner = fields.Function(fields.Many2One('asset.owner',
+        'Current Asset Owner'), 'get_current_owner',
+        searcher='search_current_owner')
+
     current_owner = fields.Function(fields.Many2One('party.party',
             'Current Owner'), 'get_current_owner',
         searcher='search_current_owner')
@@ -115,6 +119,9 @@ class Asset:
             if 'current_owner_contact' in names:
                 result['current_owner_contact'][asset] = (assigment.contact.id
                     if assigment.contact else None)
+            if 'current_asset_owner' in names:
+                result['current_asset_owner'][asset] = (assigment.id)
+
         return result
 
     @classmethod

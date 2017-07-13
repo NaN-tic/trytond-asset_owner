@@ -5,5 +5,6 @@
     <field name="from_date"/>
     <field name="through_date"/>
     <field name="owner"/>
+    <field name="owner_reference"/>
     <field name="contact"/>
 </tree>

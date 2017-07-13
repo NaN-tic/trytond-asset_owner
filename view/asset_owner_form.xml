@@ -8,6 +8,8 @@
     <field name="through_date"/>
     <label name="owner"/>
     <field name="owner"/>
+    <label name="owner_reference"/>
+    <field name="owner_reference"/>
     <label name="contact"/>
     <field name="contact"/>
 </form>
