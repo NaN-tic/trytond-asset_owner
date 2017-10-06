@@ -1,13 +1,15 @@
 <?xml version="1.0"?>
 <!-- The COPYRIGHT file at the top level of this repository contains the full
      copyright notices and license terms. -->
-<form>
+<form string="Asset Owner">
     <label name="from_date"/>
     <field name="from_date"/>
     <label name="through_date"/>
     <field name="through_date"/>
     <label name="owner"/>
     <field name="owner"/>
+    <label name="owner_reference"/>
+    <field name="owner_reference"/>
     <label name="contact"/>
     <field name="contact"/>
 </form>

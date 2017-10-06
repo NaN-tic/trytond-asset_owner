@@ -1,17 +1,14 @@
 # The COPYRIGHT file at the top level of this repository contains the full
 # copyright notices and license terms.
-from datetime import date
 from sql import Null
 
 from trytond import backend
 from trytond.pool import PoolMeta, Pool
 from trytond.model import fields
 from trytond.transaction import Transaction
-
 from trytond.modules.asset.asset import AssetAssignmentMixin
 
 __all__ = ['Asset', 'AssetOwner']
-__metaclass__ = PoolMeta
 
 
 class AssetOwner(AssetAssignmentMixin):
@@ -37,11 +34,18 @@ class AssetOwner(AssetAssignmentMixin):
 
 class Asset:
     __name__ = 'asset'
+    __metaclass__ = PoolMeta
+
     owners = fields.One2Many('asset.owner', 'asset', 'Owners')
+    current_asset_owner = fields.Function(fields.Many2One('asset.owner',
+        'Current Asset Owner'), 'get_current_owner',
+        searcher='search_current_owner')
+
     current_owner = fields.Function(fields.Many2One('party.party',
-        'Current Owner'), 'get_current_owner')
+            'Current Owner'), 'get_current_owner',
+        searcher='search_current_owner')
     current_owner_contact = fields.Function(fields.Many2One('party.party',
-        'Current Owner Contact'), 'get_current_owner')
+            'Current Owner Contact'), 'get_current_owner')
 
     @classmethod
     def __register__(cls, module_name):
@@ -60,9 +64,12 @@ class Asset:
 
         super(Asset, cls).__register__(module_name)
 
+        pool = Pool()
+        Date = pool.get('ir.date')
+        today = Date.today()
         handler = TableHandler(cls, module_name)
         # Migration: owner Many2One replaced by One2Many
-        if owner_exist:
+        if owner_exist and asset_owner_table:
             assert contact_exist and owner_reference_exist
             cursor.execute(*table.select(
                     table.id,
@@ -72,18 +79,21 @@ class Asset:
                     where=table.owner != Null))
             for asset_id, owner_id, contact_id, owner_reference \
                     in cursor.fetchall():
-                asset_owner_table.insert([
+                cursor.execute(*asset_owner_table.insert([
                         asset_owner_table.asset,
                         asset_owner_table.owner,
                         asset_owner_table.contact,
                         asset_owner_table.owner_reference,
-                        asset_owner_table.from_date],
+                        asset_owner_table.from_date,
+                        ],
                     [[
                             asset_id,
                             owner_id,
                             contact_id if contact_id else Null,
                             owner_reference if owner_reference else Null,
-                            date.min]])
+                            today
+                            ]]))
+
             handler.drop_column('owner')
             handler.drop_column('contact')
             handler.drop_column('owner_reference')
@@ -100,11 +110,24 @@ class Asset:
         for asset, assigment_id in assigments.iteritems():
             if not assigment_id:
                 continue
-            assigment = AssetOwner(assigment_id)
+            with Transaction().set_context(active_test=False):
+                assigment = AssetOwner(assigment_id)
             if 'current_owner' in names:
                 result['current_owner'][asset] = (assigment.owner.id
                     if assigment.owner else None)
             if 'current_owner_contact' in names:
                 result['current_owner_contact'][asset] = (assigment.contact.id
                     if assigment.contact else None)
+            if 'current_asset_owner' in names:
+                result['current_asset_owner'][asset] = (assigment.id)
+
         return result
+
+    @classmethod
+    def search_current_owner(cls, name, clause):
+        pool = Pool()
+        AssetOwner = pool.get('asset.owner')
+        owners = AssetOwner.search(
+            [tuple(('owner',)) + tuple(clause[1:])])
+
+        return [('id', 'in', [x.asset.id for x in owners])]

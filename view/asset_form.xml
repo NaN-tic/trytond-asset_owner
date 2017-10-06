@@ -2,7 +2,7 @@
 <!-- The COPYRIGHT file at the top level of this repository contains the full
      copyright notices and license terms. -->
 <data>
-    <xpath expr="/form/notebook/page[@id='address']" position="after">
+    <xpath expr="/form/notebook/page[@id='addresses']" position="after">
         <page id="owners" string="Owners">
             <label name="current_owner"/>
             <field name="current_owner"/>
