@@ -1,13 +1,11 @@
 # The COPYRIGHT file at the top level of this repository contains the full
 # copyright notices and license terms.
-from datetime import date
 from sql import Null
 
 from trytond import backend
 from trytond.pool import PoolMeta, Pool
 from trytond.model import fields
 from trytond.transaction import Transaction
-
 from trytond.modules.asset.asset import AssetAssignmentMixin
 
 __all__ = ['Asset', 'AssetOwner']
@@ -112,7 +110,8 @@ class Asset:
         for asset, assigment_id in assigments.iteritems():
             if not assigment_id:
                 continue
-            assigment = AssetOwner(assigment_id)
+            with Transaction().set_context(active_test=False):
+                assigment = AssetOwner(assigment_id)
             if 'current_owner' in names:
                 result['current_owner'][asset] = (assigment.owner.id
                     if assigment.owner else None)
