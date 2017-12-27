@@ -29,7 +29,8 @@ class AssetOwner(AssetAssignmentMixin):
 
     @classmethod
     def search_company(cls, name, clause):
-        return [('asset.%s' % name,) + tuple(clause[1:])]
+        return [('asset.company' + clause[0].lstrip(name),)
+            + tuple(clause[1:])]
 
 
 class Asset:
