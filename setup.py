@@ -58,7 +58,7 @@ if minor_version % 2:
 else:
     branch = series
 dependency_links = [
-    ('hg+ssh://hg@bitbucket.org/nantic/trytond-asset@%(branch)s'
+    ('hg+https://bitbucket.org/nantic/trytond-asset@%(branch)s'
         '#egg=nantic_asset-%(series)s' % {
             'branch': branch,
             'series': series,
