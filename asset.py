@@ -33,9 +33,8 @@ class AssetOwner(AssetAssignmentMixin):
             + tuple(clause[1:])]
 
 
-class Asset:
+class Asset(metaclass=PoolMeta):
     __name__ = 'asset'
-    __metaclass__ = PoolMeta
 
     owners = fields.One2Many('asset.owner', 'asset', 'Owners')
     current_asset_owner = fields.Function(fields.Many2One('asset.owner',
@@ -108,7 +107,7 @@ class Asset:
         for name in names:
             result[name] = dict((i.id, None) for i in assets)
 
-        for asset, assigment_id in assigments.iteritems():
+        for asset, assigment_id in assigments.items():
             if not assigment_id:
                 continue
             with Transaction().set_context(active_test=False):
