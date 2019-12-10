@@ -51,13 +51,12 @@ class Asset(metaclass=PoolMeta):
     def __register__(cls, module_name):
         pool = Pool()
         AssetOwner = pool.get('asset.owner')
-        TableHandler = backend.get('TableHandler')
 
         table = cls.__table__()
         asset_owner_table = AssetOwner.__table__()
 
         cursor = Transaction().connection.cursor()
-        handler = TableHandler(cls, module_name)
+        handler = backend.TableHandler(cls, module_name)
         owner_exist = handler.column_exist('owner')
         contact_exist = handler.column_exist('contact')
         owner_reference_exist = handler.column_exist('owner_reference')
@@ -67,7 +66,7 @@ class Asset(metaclass=PoolMeta):
         pool = Pool()
         Date = pool.get('ir.date')
         today = Date.today()
-        handler = TableHandler(cls, module_name)
+        handler = backend.TableHandler(cls, module_name)
         # Migration: owner Many2One replaced by One2Many
         if owner_exist and asset_owner_table:
             assert contact_exist and owner_reference_exist
