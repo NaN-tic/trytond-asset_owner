@@ -4,6 +4,7 @@ from sql import Null
 
 from trytond import backend
 from trytond.pool import PoolMeta, Pool
+from trytond.pyson import Eval
 from trytond.model import fields
 from trytond.transaction import Transaction
 from trytond.modules.asset.asset import AssetAssignmentMixin
@@ -14,12 +15,20 @@ __all__ = ['Asset', 'AssetOwner']
 class AssetOwner(AssetAssignmentMixin):
     'Asset Owner'
     __name__ = 'asset.owner'
-    asset = fields.Many2One('asset', 'Asset', required=True,
+    asset = fields.Many2One('asset', "Asset", required=True,
         ondelete='CASCADE')
-    owner = fields.Many2One('party.party', 'Owner', required=True)
-    contact = fields.Many2One('party.party', 'Contact')
-    owner_reference = fields.Char('Owner Reference')
-    company = fields.Function(fields.Many2One('company.company', 'Company'),
+    owner = fields.Many2One('party.party', "Owner", required=True,
+        context={
+            'company': Eval('company', None),
+            },
+        depends=['company'])
+    contact = fields.Many2One('party.party', "Contact",
+        context={
+            'company': Eval('company', None),
+            },
+        depends=['company'])
+    owner_reference = fields.Char("Owner Reference")
+    company = fields.Function(fields.Many2One('company.company', "Company"),
         'on_change_with_company', searcher='search_company')
 
     @fields.depends('asset', '_parent_asset.company')
@@ -36,16 +45,23 @@ class AssetOwner(AssetAssignmentMixin):
 class Asset(metaclass=PoolMeta):
     __name__ = 'asset'
 
-    owners = fields.One2Many('asset.owner', 'asset', 'Owners')
+    owners = fields.One2Many('asset.owner', 'asset', "Owners")
     current_asset_owner = fields.Function(fields.Many2One('asset.owner',
-        'Current Asset Owner'), 'get_current_owner',
+        "Current Asset Owner"), 'get_current_owner',
         searcher='search_current_owner')
-
     current_owner = fields.Function(fields.Many2One('party.party',
-            'Current Owner'), 'get_current_owner',
-        searcher='search_current_owner')
+        "Current Owner",
+        context={
+            'company': Eval('company', None),
+            },
+        depends=['company']),
+        'get_current_owner', searcher='search_current_owner')
     current_owner_contact = fields.Function(fields.Many2One('party.party',
-            'Current Owner Contact'), 'get_current_owner')
+        "Current Owner Contact",
+        context={
+            'company': Eval('company', None),
+            },
+        depends=['company']), 'get_current_owner')
 
     @classmethod
     def __register__(cls, module_name):
