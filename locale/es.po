@@ -2,10 +2,6 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
-msgctxt "error:asset.owner:"
-msgid "\"%(first)s\" and \"%(second)s\" overlap."
-msgstr "\"%(first)s\" y \"%(second)s\" se superponen."
-
 msgctxt "field:asset,address:"
 msgid "Address"
 msgstr "Direcciones"
