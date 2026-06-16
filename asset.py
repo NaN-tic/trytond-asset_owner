@@ -2,7 +2,6 @@
 # copyright notices and license terms.
 from sql import Null
 
-from trytond import backend
 from trytond.pool import PoolMeta, Pool
 from trytond.pyson import Eval
 from trytond.model import fields
@@ -72,7 +71,7 @@ class Asset(metaclass=PoolMeta):
         asset_owner_table = AssetOwner.__table__()
 
         cursor = Transaction().connection.cursor()
-        handler = backend.TableHandler(cls, module_name)
+        handler = cls.__table_handler__(module_name)
         owner_exist = handler.column_exist('owner')
         contact_exist = handler.column_exist('contact')
         owner_reference_exist = handler.column_exist('owner_reference')
@@ -82,7 +81,7 @@ class Asset(metaclass=PoolMeta):
         pool = Pool()
         Date = pool.get('ir.date')
         today = Date.today()
-        handler = backend.TableHandler(cls, module_name)
+        handler = cls.__table_handler__(module_name)
         # Migration: owner Many2One replaced by One2Many
         if owner_exist and asset_owner_table:
             assert contact_exist and owner_reference_exist
